@@ -181,7 +181,9 @@ getAccessToken code prov = liftIO $ do
                 $ addRequestHeader "Accept" "application/json"
                 $ setRequestQueryString [ ("client_id", justText . oauthClientId $ prov)
                                         , ("client_secret", justText . oauthClientSecret $ prov)
-                                        , ("code", justText code)]
+                                        , ("code", justText code)
+                                        , ("grant_type", justText "authorization_code")
+                                        , ("redirect_uri", justText . oauthCallback $ prov)]
                 $ request'
   response <- httpJSONEither request
   return $ case (getResponseBody response :: Either JSONException Object) of
