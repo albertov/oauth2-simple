@@ -54,7 +54,7 @@ data OAuth2 = OAuth2 { oauthClientId :: Text
 type Scope = Text
 
 renderScopes :: [Scope] -> Text
-renderScopes = T.pack . intercalate "," . map T.unpack
+renderScopes = T.pack . intercalate "+" . map T.unpack
 
 ----------
 
