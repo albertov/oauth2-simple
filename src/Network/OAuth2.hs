@@ -176,14 +176,16 @@ getAccessToken :: MonadIO m => Text -> OAuth2 -> m (Maybe Text)
 getAccessToken code prov = liftIO $ do
   let endpoint = tokenEndpoint code prov
   request' <- parseRequest (T.unpack endpoint)
-  let justText = Just . B8.pack . T.unpack
+  let text = B8.pack . T.unpack
       request = setRequestMethod "POST"
                 $ addRequestHeader "Accept" "application/json"
-                $ setRequestQueryString [ ("client_id", justText . oauthClientId $ prov)
-                                        , ("client_secret", justText . oauthClientSecret $ prov)
-                                        , ("code", justText code)
-                                        , ("grant_type", justText "authorization_code")
-                                        , ("redirect_uri", justText . oauthCallback $ prov)]
+                $ setRequestBodyURLEncoded
+                  [ ("client_id", text . oauthClientId $ prov)
+                  , ("client_secret", text . oauthClientSecret $ prov)
+                  , ("code", text code)
+                  , ("grant_type", text "authorization_code")
+                  , ("redirect_uri", text . oauthCallback $ prov)
+                  ]
                 $ request'
   response <- httpJSONEither request
   return $ case (getResponseBody response :: Either JSONException Object) of
